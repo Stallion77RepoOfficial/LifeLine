@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/dark_background"
+    android:padding="24dp"
+    android:gravity="center_horizontal">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/app_name"
+        android:textColor="@color/text_light"
+        android:textSize="36sp"
+        android:textStyle="bold"
+        android:letterSpacing="0.1"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="60dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnEmergency"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:text="@string/emergency_mode"
+        android:textSize="18sp"
+        app:backgroundTint="@color/emergency_red"
+        android:layout_marginBottom="24dp"
+        android:elevation="8dp"/>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnRescue"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:text="@string/rescue_mode"
+        android:textSize="18sp"
+        app:backgroundTint="@color/rescue_green"
+        android:elevation="8dp"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="32dp"
+        android:background="@color/console_background"
+        android:padding="12dp">
+        
+        <TextView
+            android:id="@+id/txtStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/status_ready"
+            android:textColor="@color/console_green"
+            android:fontFamily="monospace"
+            android:textSize="14sp"/>
+    </ScrollView>
+
+</LinearLayout>
