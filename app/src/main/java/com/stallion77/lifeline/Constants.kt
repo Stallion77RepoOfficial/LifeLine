@@ -10,4 +10,10 @@ object Constants {
     // Ses Ayarları (Telsiz Kalitesi)
     const val SAMPLE_RATE = 8000
     const val LOG_TAG = "LifeLineEngine"
+    
+    // Kontrol Sinyalleri (PTT Mode)
+    const val SIGNAL_MARKER: Byte = 0x7F      // Sinyal başlangıcı
+    const val SIGNAL_START_TALKING: Byte = 0x01
+    const val SIGNAL_STOP_TALKING: Byte = 0x02
+    const val SIGNAL_DISCONNECT: Byte = 0x03
 }

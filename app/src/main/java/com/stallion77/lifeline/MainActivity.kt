@@ -12,7 +12,10 @@ import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.view.MotionEvent
+import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -21,9 +24,20 @@ import androidx.core.app.ActivityCompat
 class MainActivity : AppCompatActivity() {
 
     private lateinit var engine: LifeLineEngine
+    
+    // Main Menu Views
+    private lateinit var layoutMainMenu: LinearLayout
     private lateinit var txtStatus: TextView
     private lateinit var btnEmergency: Button
     private lateinit var btnRescue: Button
+    
+    // Walkie-Talkie Views
+    private lateinit var layoutWalkieTalkie: LinearLayout
+    private lateinit var txtWalkieStatus: TextView
+    private lateinit var txtTalkingIndicator: TextView
+    private lateinit var btnPushToTalk: Button
+    private lateinit var btnDisconnect: Button
+    
     private var bluetoothAdapter: BluetoothAdapter? = null
 
     companion object {
@@ -52,8 +66,6 @@ class MainActivity : AppCompatActivity() {
                             txtStatus.append("\n> Found: $deviceName ($deviceAddress)")
                         }
                         
-                        // LifeLine cihazlarını otomatik bağla
-                        // Not: Gerçek uygulamada UUID filtresi veya özel isim kontrolü yapılabilir
                         if (engine.isCurrentlyScanning()) {
                             engine.stopScanning()
                             bluetoothAdapter?.cancelDiscovery()
@@ -85,38 +97,77 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Main Menu Views
+        layoutMainMenu = findViewById(R.id.layoutMainMenu)
         txtStatus = findViewById(R.id.txtStatus)
         btnEmergency = findViewById(R.id.btnEmergency)
         btnRescue = findViewById(R.id.btnRescue)
+        
+        // Walkie-Talkie Views
+        layoutWalkieTalkie = findViewById(R.id.layoutWalkieTalkie)
+        txtWalkieStatus = findViewById(R.id.txtWalkieStatus)
+        txtTalkingIndicator = findViewById(R.id.txtTalkingIndicator)
+        btnPushToTalk = findViewById(R.id.btnPushToTalk)
+        btnDisconnect = findViewById(R.id.btnDisconnect)
 
-        // Bluetooth Adapter Başlatma
+        // Bluetooth Adapter
         val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         bluetoothAdapter = bluetoothManager.adapter
 
         if (bluetoothAdapter == null) {
-            txtStatus.text = "ERROR: Bluetooth not supported on this device!"
+            txtStatus.text = "ERROR: Bluetooth not supported!"
             btnEmergency.isEnabled = false
             btnRescue.isEnabled = false
             return
         }
 
-        // Engine Başlatma
+        // Engine
         engine = LifeLineEngine(bluetoothAdapter!!) { message ->
             runOnUiThread {
                 txtStatus.append("\n> $message")
             }
         }
 
-        // Discovery Receiver kaydet
-        registerDiscoveryReceiver()
+        // Engine Callbacks
+        engine.onConnected = { isRescueMode ->
+            runOnUiThread {
+                showWalkieTalkieMode(isRescueMode)
+            }
+        }
 
+        engine.onDisconnected = {
+            runOnUiThread {
+                showMainMenu()
+                Toast.makeText(this, "Connection ended", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        engine.onRemoteTalkingStateChanged = { isTalking ->
+            runOnUiThread {
+                if (isTalking) {
+                    txtTalkingIndicator.text = "🔊 Other person is talking..."
+                    txtTalkingIndicator.setTextColor(getColor(R.color.console_green))
+                    btnPushToTalk.isEnabled = false
+                    btnPushToTalk.alpha = 0.5f
+                } else {
+                    txtTalkingIndicator.text = "Hold button to talk"
+                    txtTalkingIndicator.setTextColor(getColor(R.color.text_light))
+                    btnPushToTalk.isEnabled = true
+                    btnPushToTalk.alpha = 1.0f
+                }
+            }
+        }
+
+        // Discovery Receiver
+        registerDiscoveryReceiver()
         checkAndRequestPermissions()
 
-        // RESCUE MODE - Cihazı görünür yap ve bağlantı bekle
+        // RESCUE MODE Button
         btnRescue.setOnClickListener {
             if (checkAllPermissions()) {
                 if (bluetoothAdapter?.isEnabled == true) {
@@ -127,7 +178,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // EMERGENCY MODE - Yakındaki cihazları tara
+        // EMERGENCY MODE Button
         btnEmergency.setOnClickListener {
             if (checkAllPermissions()) {
                 if (bluetoothAdapter?.isEnabled == true) {
@@ -137,6 +188,52 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        // Push-to-Talk Button (Touch Listener)
+        btnPushToTalk.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    // Basıldı - Konuşmaya başla
+                    engine.startTalking()
+                    btnPushToTalk.text = "🎤\nTALKING..."
+                    btnPushToTalk.setBackgroundColor(getColor(R.color.emergency_red))
+                    txtTalkingIndicator.text = "Release to send"
+                    true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    // Bırakıldı - Konuşmayı bitir
+                    engine.stopTalking()
+                    btnPushToTalk.text = "🎤\nHOLD TO TALK"
+                    btnPushToTalk.setBackgroundColor(getColor(R.color.rescue_green))
+                    txtTalkingIndicator.text = "Hold button to talk"
+                    true
+                }
+                else -> false
+            }
+        }
+
+        // Disconnect Button (Sadece Rescue Mode)
+        btnDisconnect.setOnClickListener {
+            engine.disconnect()
+        }
+    }
+
+    private fun showWalkieTalkieMode(isRescueMode: Boolean) {
+        layoutMainMenu.visibility = View.GONE
+        layoutWalkieTalkie.visibility = View.VISIBLE
+        
+        txtWalkieStatus.text = "CONNECTED"
+        txtTalkingIndicator.text = "Hold button to talk"
+        
+        // Disconnect butonu sadece Rescue Mode'da görünür
+        btnDisconnect.visibility = if (isRescueMode) View.VISIBLE else View.GONE
+    }
+
+    private fun showMainMenu() {
+        layoutWalkieTalkie.visibility = View.GONE
+        layoutMainMenu.visibility = View.VISIBLE
+        
+        txtStatus.text = getString(R.string.status_ready)
     }
 
     private fun registerDiscoveryReceiver() {
@@ -148,22 +245,19 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(discoveryReceiver, filter)
     }
 
-    // Cihazı görünür yap (Rescue Mode için)
     @SuppressLint("MissingPermission")
     private fun makeDeviceDiscoverable() {
         txtStatus.append("\n> Making device discoverable...")
         
-        // 300 saniye (5 dakika) görünür ol
         val discoverableIntent = Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE).apply {
             putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300)
         }
+        @Suppress("DEPRECATION")
         startActivityForResult(discoverableIntent, REQUEST_DISCOVERABLE)
     }
 
-    // Cihaz taramayı başlat (Emergency Mode için)
     @SuppressLint("MissingPermission")
     private fun startDeviceDiscovery() {
-        // Önceki taramayı iptal et
         if (bluetoothAdapter?.isDiscovering == true) {
             bluetoothAdapter?.cancelDiscovery()
         }
@@ -178,7 +272,7 @@ class MainActivity : AppCompatActivity() {
         
         if (requestCode == REQUEST_DISCOVERABLE) {
             if (resultCode > 0) {
-                txtStatus.append("\n> Device is now discoverable for $resultCode seconds")
+                txtStatus.append("\n> Device discoverable for $resultCode seconds")
                 engine.startRescueMode()
             } else {
                 txtStatus.append("\n> Discoverability denied")
@@ -208,7 +302,6 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.RECORD_AUDIO
         )
 
-        // Android 12 (S) ve sonrası için yeni izinler
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             permissions.add(Manifest.permission.BLUETOOTH_SCAN)
             permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
@@ -243,9 +336,7 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         try {
             unregisterReceiver(discoveryReceiver)
-        } catch (e: Exception) {
-            // Receiver zaten unregister edilmiş olabilir
-        }
+        } catch (e: Exception) { }
         bluetoothAdapter?.cancelDiscovery()
         if (::engine.isInitialized) {
             engine.stop()
