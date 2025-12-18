@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">LifeLine</string>
+    <string name="emergency_mode">EMERGENCY MODE\n(Connect)</string>
+    <string name="rescue_mode">RESCUE MODE\n(Wait for Help)</string>
+    <string name="status_ready">System ready. Select a mode.</string>
+    <string name="cancel">CANCEL</string>
+    <string name="connected">CONNECTED</string>
+    <string name="hold_to_talk">Hold to talk</string>
+    <string name="talking">TALKING...</string>
+    <string name="release_to_stop">Release to stop</string>
+    <string name="other_talking">🔊 Other person is talking...</string>
+    <string name="end_connection">END CONNECTION</string>
+    <string name="connection_ended">Connection ended</string>
+    <string name="enable_bluetooth">Enable Bluetooth</string>
+    <string name="permissions_required">Permissions required!</string>
+    <string name="bluetooth_on">Bluetooth: ON ✓</string>
+    <string name="bluetooth_off">Bluetooth: OFF</string>
+    <string name="location_on">Location: ON ✓</string>
+    <string name="location_off">Location: OFF</string>
+    <string name="location_required">Location Required</string>
+    <string name="location_message">Location must be enabled for Bluetooth scanning</string>
+    <string name="settings">Settings</string>
+    <string name="scanning">Scanning...</string>
+    <string name="discoverable">Discoverable...</string>
+    
+    <!-- Menu -->
+    <string name="menu">Menu</string>
+    <string name="about">About</string>
+    <string name="language">Language</string>
+    <string name="turkish">Türkçe</string>
+    <string name="english">English</string>
+    <string name="about_title">About LifeLine</string>
+    <string name="about_message">LifeLine v1.0\n\nBluetooth-based emergency walkie-talkie app.\n\nCommunicate with nearby devices without internet or cellular network.\n\n© 2024 Stallion77</string>
+    <string name="ok">OK</string>
+    <string name="language_changed">Restart app for language change</string>
+</resources>

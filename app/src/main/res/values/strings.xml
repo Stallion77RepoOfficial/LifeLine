@@ -1,6 +1,36 @@
 <resources>
     <string name="app_name">LifeLine</string>
-    <string name="emergency_mode">EMERGENCY MODE\n(CONNECT)</string>
-    <string name="rescue_mode">RESCUE MODE\n(WAIT FOR HELP)</string>
-    <string name="status_ready">System Initialized. Ready.</string>
+    <string name="emergency_mode">ACİL DURUM MODU\n(Bağlan)</string>
+    <string name="rescue_mode">KURTARMA MODU\n(Yardım Bekle)</string>
+    <string name="status_ready">Sistem hazır. Bir mod seçin.</string>
+    <string name="cancel">İPTAL</string>
+    <string name="connected">BAĞLANDI</string>
+    <string name="hold_to_talk">Konuşmak için basılı tut</string>
+    <string name="talking">KONUŞULUYOR...</string>
+    <string name="release_to_stop">Durdurmak için bırak</string>
+    <string name="other_talking">🔊 Karşı taraf konuşuyor...</string>
+    <string name="end_connection">BAĞLANTIYI KAPAT</string>
+    <string name="connection_ended">Bağlantı sonlandı</string>
+    <string name="enable_bluetooth">Bluetooth\'u açın</string>
+    <string name="permissions_required">İzinler gerekli!</string>
+    <string name="bluetooth_on">Bluetooth: AÇIK ✓</string>
+    <string name="bluetooth_off">Bluetooth: KAPALI</string>
+    <string name="location_on">Konum: AÇIK ✓</string>
+    <string name="location_off">Konum: KAPALI</string>
+    <string name="location_required">Konum Gerekli</string>
+    <string name="location_message">Bluetooth taraması için konum açık olmalı</string>
+    <string name="settings">Ayarlar</string>
+    <string name="scanning">Taranıyor...</string>
+    <string name="discoverable">Görünür dur...</string>
+    
+    <!-- Menu -->
+    <string name="menu">Menü</string>
+    <string name="about">Hakkında</string>
+    <string name="language">Dil</string>
+    <string name="turkish">Türkçe</string>
+    <string name="english">English</string>
+    <string name="about_title">LifeLine Hakkında</string>
+    <string name="about_message">LifeLine v1.0\n\nBluetooth tabanlı acil durum telsiz uygulaması.\n\nİnternet veya GSM şebekesi olmadan yakındaki cihazlarla sesli iletişim kurun.\n\n© 2024 Stallion77</string>
+    <string name="ok">Tamam</string>
+    <string name="language_changed">Dil değişikliği için uygulamayı yeniden başlatın</string>
 </resources>
